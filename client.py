@@ -54,7 +54,7 @@ class Qtable:
             file.close()
     
     # Muda um valor na tabela Q para um estado e ação especifico.
-    def setQTableValue(self, state: int, action: str, value: float):
+    def setValue(self, state: int, action: str, value: float):
         if Qtable._isValidAction(action):
             if state < self._table_size:
                 self._table[action][state] = value
@@ -66,6 +66,26 @@ class Qtable:
     # Verifica se a ação recebida é uma ação valida.
     def _isValidAction(action: str):
         return action == "left" or action == "right" or action == "jump"
+    
+    # Retorna o valor da tabela Q, que está no estado e ação especificados.
+    def getValue(self, state: int, action: str):
+        if Qtable._isValidAction(action):
+            if state < self._table_size:
+                return self._table[action][state]
+            else:
+                print("ERRO: ESTADO INVALIDO")
+        else:
+            print("ERRO: AÇÃO INVALIDA")
+    
+    # Retorna o maior valor de um estado especificado da tabela Q.
+    def getMaxValue(self, state: int):
+        if state < self._table_size:
+            action_left = self._table["left"][state]
+            action_right = self._table["right"][state]
+            action_jump = self._table["jump"][state]
+            return max(action_left, action_right, action_jump)
+        else:
+            print("ERRO: ESTADO INVALIDO")
 
 
 # --- CONVERTER:
@@ -91,7 +111,9 @@ def learn():
     q_table.load(q_table_path)
     """s = cn.connect(2037)
     state, value = cn.get_state_reward(s, "jump")"""
-    q_table.setQTableValue(0, "jump", 10)
+    q_table.setValue(0, "jump", 10)
+    print(q_table.getValue(2, "right"))
+    print(q_table.getMaxValue(5))
     q_table.save(q_table_path)
 
 # Recria a tabela Q com valores aleatorios:
