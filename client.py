@@ -52,6 +52,16 @@ class Qtable:
             file.close()
 
 
+# --- CONVERTER:
+# Trnasforma uma string de binario para um numero inteiro.
+def binaryInt(binary: str):
+    return int(binary, 2)
+
+# Transforma um numero inteiro em uma string de binario.
+def intBinary(integer: int):
+    return bin(integer)
+
+
 # --- EXECUÇÃO:
 # Reseta a tabela Q:
 def reset():
@@ -64,7 +74,8 @@ def learn():
     q_table = Qtable()
     q_table.load(q_table_path)
     s = cn.connect(2037)
-    print(cn.get_state_reward(s, "right"))
+    state, value = cn.get_state_reward(s, "jump")
+    print(f"State: {binaryInt(state)}")
     q_table.save(q_table_path)
 
 # Recria a tabela Q com valores aleatorios:
