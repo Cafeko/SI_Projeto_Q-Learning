@@ -29,9 +29,9 @@ class Qtable:
             value = Qtable._generateRandomValue()
             self._table["jump"].append(value)
 
-    # Gera um float aleatorio entre -10 e 10, com precisão de 6 casas decimais.
+    # Gera um float aleatorio entre 1 e 10, com precisão de 6 casas decimais.
     def _generateRandomValue():
-        return round(random.uniform(-10.0, 10.0), 6)
+        return round(random.uniform(1, 10.0), 6)
 
     # Salva o conteudo da tabelaQ da classe para o arquivo.
     def save(self, path):
@@ -168,9 +168,9 @@ def learn():
     q_table = Qtable()
     q_table.load(q_table_path)
     start_state = 0
-    random_act = 0.5
-    n_actions = 5000
-    gamma = 0.85
+    random_act = 0.4
+    n_actions = 1000
+    gamma = 0.9
     alpha = 0.3
     qLearning(q_table, start_state, random_act, n_actions, gamma, alpha)
     q_table.save(q_table_path)
@@ -181,8 +181,18 @@ def randomize():
     q_table.randomizeQTable()
     q_table.save(q_table_path)
 
+def run():
+    q_table = Qtable()
+    q_table.load(q_table_path)
+    s = cn.connect(2037)
+    current_state = 0
+    while True:
+        act = q_table.getNextAction(current_state)
+        state_binary, reward = cn.get_state_reward(s, act)
+        current_state = binaryInt(state_binary)
+
 if __name__ == "__main__":
-    print("COMANDOS:\n   t = Treinar\n   a - Deixa a tabela Q aleatoria\n   r - Reseta a tabela\n")
+    print("COMANDOS:\n   t = Treinar\n   a - Deixa a tabela Q aleatoria\n   r - Reseta a tabela\n   s - Start\n ")
     command = input(">> ").lower()
     if command == "t":
         learn()
@@ -190,5 +200,7 @@ if __name__ == "__main__":
         randomize()
     elif command == "r": 
         reset()
+    elif command == "s":
+        run()
     else:
         print("COMANDO INVALIDO!")
