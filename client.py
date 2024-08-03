@@ -114,13 +114,13 @@ def intBinary(integer: int):
 
 
 # --- Q Learning:
-def qLearning(q_table: Qtable, start_state: int, random_action: float, action_number=1000, gamma=0.7, alpha=0.5):
+def qLearning(q_table: Qtable, start_state: int, random_action: float, action_number=1000, discount_value=0.7, learning_rate=0.5):
     """
     q_table: objeto da classe QTable que contem a tabela que será usada para o aprendizado.
     start_state: estado que está no inicio do treinamento.
     action_number: numero de ações que irá fazer, treinamento acaba ao atingir dado umero de ações.
-    gamma: valor de desconto, determina o quanto que a recompenssa futura e valorizada em relação a recompensa atual.
-    alpha: taxa de aprendizado.
+    discount_value: valor de desconto, determina o quanto que a recompenssa futura e valorizada em relação a recompensa atual.
+    learning_rate: taxa de aprendizado.
     """
     # Preparação:
     s = cn.connect(2037)
@@ -138,21 +138,21 @@ def qLearning(q_table: Qtable, start_state: int, random_action: float, action_nu
         new_state = binaryInt(state_binary)
         # atualiza valor da ação na tabela:
         current_state_action_value = q_table.getValue(current_state, act) # Pega o valor da ação feita, no estado atual.
-        q_estimate = bellmanEquation(q_table, new_state, reward, gamma)   # Usa a equação de Bellman para obter a estimativa de Q(s,a).
+        q_estimate = bellmanEquation(q_table, new_state, reward, discount_value)   # Usa a equação de Bellman para obter a estimativa de Q(s,a).
         error = q_estimate - current_state_action_value                   # Obtem o erro fazendo a estmativa de Q(s,a) menos o valor relacionado a ação e o estado atual.
-        update_value = current_state_action_value + (alpha * error)       # Obtem o novo valor da ação, fazendo a soma do valor atual mais o error vezes a taxa de aprendizado.
+        update_value = current_state_action_value + (learning_rate * error)       # Obtem o novo valor da ação, fazendo a soma do valor atual mais o error vezes a taxa de aprendizado.
         q_table.setValue(current_state, act, update_value)                # Atualiza a tabela com o valor obtido.
         # atualiza estado:
         current_state = new_state
 
-def bellmanEquation(q_table: Qtable, new_state: int, reward, gamma: float):
+def bellmanEquation(q_table: Qtable, new_state: int, reward, discount_value: float):
     """
     q_table: objeto da classe QTable que contem a tabela que será usada para o aprendizado.
     new_state: Estado em que foi parar após a ter feito a ação.
     reward: recompensa do novo estado.
-    gamma: valor de desconto, determina o quanto que a recompenssa futura e valorizada em relação a recompensa atual.
+    discount_value: valor de desconto, determina o quanto que a recompenssa futura e valorizada em relação a recompensa atual.
     """
-    return reward + (gamma * q_table.getMaxValue(new_state))
+    return reward + (discount_value * q_table.getMaxValue(new_state))
 
 
 
@@ -170,9 +170,9 @@ def learn():
     start_state = 0
     random_act = 0.4
     n_actions = 1000
-    gamma = 0.9
-    alpha = 0.3
-    qLearning(q_table, start_state, random_act, n_actions, gamma, alpha)
+    discount_value = 0.9
+    learning_rate = 0.3
+    qLearning(q_table, start_state, random_act, n_actions, discount_value, learning_rate)
     q_table.save(q_table_path)
 
 # Recria a tabela Q com valores aleatorios:
